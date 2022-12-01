@@ -1,0 +1,106 @@
+import datetime,time
+import threading
+
+from tkinter import *
+from tkinter import ttk
+
+import functions as f
+
+class Main():
+    
+    def __init__(self, root):
+        self.sleep_time = datetime.datetime(2022, 11, 30, hour=21)
+        self.root =root
+        self.items = []
+        self.items_added = ""
+        self.ref = False
+        self.actives = False
+        
+        self.item_str = StringVar()
+        self.left_time_str = StringVar()
+
+        self.get_left_time()
+
+        root.title("排课软件")
+
+        self.mainframe = ttk.Frame(root,padding="3 3 12 12")
+        self.mainframe.grid(column=0,row=0,sticky=(N,W,E,S))
+        root.columnconfigure(0,weight=1)
+        root.rowconfigure(0,weight=1)
+
+        self.item_str_set = StringVar()
+        self.item_str_set_entry = ttk.Entry(self.mainframe, width=50, textvariable=self.item_str_set)
+
+        #root.after(1,self.get_left_time)
+        self.check_actives()
+        self.display()
+
+        item = f.load_file(self.items, self.items_added, root)
+        self.items = item[0]
+        self.items_added = item[1]
+        self.display_item_button()
+        #root.bind("<Return>", calculate)
+
+
+    def get_item(self):
+        #得到要完成的任务并绘制
+        value = self.item_str_set.get() 
+        item= f.handle_items(value, self.items, self.items_added, root)
+        self.items = item[0]
+        self.items_added = item[1]
+        #刷新按钮
+        self.display_item_button()
+
+
+    def get_left_time(self):
+        """计算剩余时间"""
+    
+        self.end_time =self.sleep_time
+        #设置初始时间
+        now_time = datetime.datetime.now()
+        now_time_H = int(now_time.strftime("%H"))
+        now_time_M = int(now_time.strftime("%M"))
+        now_time_S = int(now_time.strftime("%S"))
+    
+        #计算剩余时间
+        left_time = self.end_time - \
+            datetime.timedelta(minutes=now_time_M,
+                               hours=now_time_H, seconds=now_time_S)
+        self.left_time_str.set(left_time.strftime("%H:%M:%S"))
+        
+        self.root.after(1000, self.get_left_time)
+    def display(self):
+        self.item_str_set_entry.grid(column=2, row=2, sticky=(W, E))
+
+        ttk.Label(self.mainframe, text="剩余时间").grid(column=1, row=1, sticky=W)
+        ttk.Label(self.mainframe, text="格式: 名字 小时;").grid(column=1, row=2, sticky=(W))
+        ttk.Label(self.mainframe, textvariable=self.left_time_str).grid(column=2, row=1, sticky=(W))
+
+        ttk.Button(self.mainframe, text="提交", command=self.get_item).grid(column=3, row=3, sticky=W)
+        self.display_item_button()
+
+    def display_item_button(self):
+        for i in range(len(self.items)):
+            self.items[i].displayme(self.mainframe, i, self.actives)
+
+    def check_actives(self): 
+
+        actives_list = []
+        root.after(1000, self.check_actives)
+
+        for item_ in self.items:
+            actives_list.append(item_.actives)
+
+        if True in actives_list:
+            self.actives = True
+        else:
+            self.actives = False
+
+        #self.ref:
+        self.display_item_button()
+        #self.ref = True
+
+root = Tk()
+tha=Main(root)
+root.mainloop()
+                
