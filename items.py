@@ -4,7 +4,7 @@ from tkinter import *
 from tkinter import ttk
 
 class Item():
-    def __init__(self, name, need_time, done_flag, root):
+    def __init__(self, name, need_time, done_flag, frame,root):
         """初始化要完成的任务"""
         self.name = name
 
@@ -23,17 +23,17 @@ class Item():
         self.button_del_str = StringVar()
         self.button_del_str.set("删除")
 
+        self.button = ttk.Button(frame, textvariable=self.button_str, command=self.start)
+        self.delete_button = ttk.Button(frame, textvariable=self.button_del_str, command=self.delete)
+        self.cancel_button = ttk.Button(frame, text="取消", command=self.cancel)
+        self.text = ttk.Label(frame, textvariable=self.need_time_str)
     def displayme(self, frame, num_row, actives, now_time=""):
         """显示任务"""
         self.start_row=3
         self.row = self.start_row+num_row
 
-        self.text = ttk.Label(frame, textvariable=self.need_time_str)
 
         self.activess =actives
-        self.button = ttk.Button(frame, textvariable=self.button_str, command=self.start)
-        self.delete_button = ttk.Button(frame, textvariable=self.button_del_str, command=self.delete)
-        self.cancel_button = ttk.Button(frame, text="取消", command=self.cancel)
 
         self.delete_button.grid(column=3, row=self.row, sticky=W)
         self.button.grid(column=2, row=self.row, sticky=W)
@@ -103,7 +103,7 @@ class Item():
         if int(self.need_time.strftime("%H")) > 5 or self.done_flag:
             self.actives = False
             self.done_flag = True
-            self.needtimestr=self.name +"时间结束 "
+            self.needtimestr=self.name +"完成 "
             self.need_time_str.set(self.needtimestr)
         if self.actives:
             self.root.after(1000,self.get_left_need_time)

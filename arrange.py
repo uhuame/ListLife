@@ -32,7 +32,7 @@ class Main():
         self.check_actives()
         self.display()
 
-        item = f.load_file(self.items, self.items_added, root)
+        item = f.load_file(self.items, self.items_added, self.mainframe, root)
         self.items = item[0]
         self.items_added = item[1]
         self.display_item_button()
@@ -42,7 +42,7 @@ class Main():
     def get_item(self):
         #得到要完成的任务并绘制
         value = self.item_str_set.get() 
-        item= f.handle_items(value, self.items, self.items_added, root)
+        item= f.handle_items(value, self.items, self.items_added, self.mainframe, root)
         self.items = item[0]
         self.items_added = item[1]
         #刷新按钮
