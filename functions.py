@@ -16,21 +16,6 @@ def load_file(items, items_added, root):
     tmp = handle_items(value, items, items_added, root)
     return tmp
 
-def get_left_time(end_time):
-    """计算剩余时间"""
-
-    #设置初始时间
-    now_time = datetime.datetime.now()
-    now_time_H = int(now_time.strftime("%H"))
-    now_time_M = int(now_time.strftime("%M"))
-    now_time_S = int(now_time.strftime("%S"))
-
-    #计算剩余时间
-    left_time = end_time - \
-        datetime.timedelta(minutes=now_time_M,
-                           hours=now_time_H, seconds=now_time_S)
-    return left_time.strftime("%H:%M:%S")
-
 def handle_items(value, items, items_added, root):
     """处理项目"""
     item = []

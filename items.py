@@ -11,6 +11,7 @@ class Item():
         self.root = root
         self.actives = False
         self.delete_flag = False
+        self.yes_flag = False
         self.need_time_H = need_time 
         self.need_time_str = StringVar()
         self.need_time = datetime.datetime(2022, 11, 30, hour=int(need_time))
@@ -18,21 +19,24 @@ class Item():
         self.need_time_str.set(self.name + " " +self.need_time.strftime("%H:%M:%S"))
 
         self.button_str = StringVar()
-        self.button_del_str = "删除"
+        self.button_del_str = StringVar()
+        self.button_del_str.set("删除")
 
     def displayme(self, frame, num_row, actives, now_time=""):
         """显示任务"""
         self.start_row=3
-        row = self.start_row+num_row
+        self.row = self.start_row+num_row
 
         self.text = ttk.Label(frame, textvariable=self.need_time_str)
-        self.text.grid(column=1, row=row, sticky=W)
 
         self.activess =actives
         self.button = ttk.Button(frame, textvariable=self.button_str, command=self.start)
-        self.delete_button = ttk.Button(frame, text=self.button_del_str, command=self.delete)
-        self.delete_button.grid(column=3, row=row, sticky=W)
-        self.button.grid(column=2, row=row, sticky=W)
+        self.delete_button = ttk.Button(frame, textvariable=self.button_del_str, command=self.delete)
+        self.cancel = ttk.Button(frame, text="取消", command=self.cancel)
+
+        self.delete_button.grid(column=3, row=self.row, sticky=W)
+        self.button.grid(column=2, row=self.row, sticky=W)
+        self.text.grid(column=1, row=self.row, sticky=W)
 
         if not actives:
             self.button_str.set("开始")
@@ -41,10 +45,20 @@ class Item():
         self.check_left_time()
 
     def delete(self):
-        self.text.destroy()
-        self.delete_button.destroy()
-        self.button.destroy()
-        self.delete_flag = True
+        if not self.yes_flag:
+            self.button_del_str.set("你确定么？")
+            self.cancel.grid(column=4, row=self.row, sticky=W)
+            self.yes_flag = True
+        else:
+            self.text.destroy()
+            self.delete_button.destroy()
+            self.button.destroy()
+            self.delete_flag = True
+
+    def cancel(self):
+            self.yes_flag = False
+            self.button_del_str.set("删除")
+            self.cancel.grid_remove()
 
     def start(self):
         """开始任务"""
