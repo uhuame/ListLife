@@ -10,6 +10,7 @@ class Item():
 
         self.root = root
         self.actives = False
+        self.delete_flag = False
         self.need_time_H = need_time 
         self.need_time_str = StringVar()
         self.need_time = datetime.datetime(2022, 11, 30, hour=int(need_time))
@@ -17,6 +18,7 @@ class Item():
         self.need_time_str.set(self.name + " " +self.need_time.strftime("%H:%M:%S"))
 
         self.button_str = StringVar()
+        self.button_del_str = "删除"
 
     def displayme(self, frame, num_row, actives, now_time=""):
         """显示任务"""
@@ -27,21 +29,30 @@ class Item():
         self.text.grid(column=1, row=row, sticky=W)
 
         self.activess =actives
-        ttk.Button(frame, textvariable=self.button_str, command=self.start).grid(column=2, row=row, sticky=W)
+        self.button = ttk.Button(frame, textvariable=self.button_str, command=self.start)
+        self.delete_button = ttk.Button(frame, text=self.button_del_str, command=self.delete)
+        self.delete_button.grid(column=3, row=row, sticky=W)
+        self.button.grid(column=2, row=row, sticky=W)
+
         if not actives:
             self.button_str.set("开始")
         else:
             self.button_str.set("已经有开始得了")
         self.check_left_time()
 
-    def start(self, ):
+    def delete(self):
+        self.text.destroy()
+        self.delete_button.destroy()
+        self.button.destroy()
+        self.delete_flag = True
+
+    def start(self):
         """开始任务"""
         now_time = datetime.datetime.now()
-        if not self.activess:
-            if not self.actives:
-                self.end_time =  now_time + datetime.timedelta(hours=int(self.need_time_H))
-                self.get_left_need_time()
-                self.actives =True
+        if not self.activess and not self.actives:
+            self.end_time =  now_time + datetime.timedelta(hours=int(self.need_time_H))
+            self.get_left_need_time()
+            self.actives =True
 
     def get_left_need_time(self):
         """得到剩余时间"""

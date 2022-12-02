@@ -13,7 +13,6 @@ class Main():
         self.root =root
         self.items = []
         self.items_added = ""
-        self.ref = False
         self.actives = False
         
         self.item_str = StringVar()
@@ -29,9 +28,8 @@ class Main():
         root.rowconfigure(0,weight=1)
 
         self.item_str_set = StringVar()
-        self.item_str_set_entry = ttk.Entry(self.mainframe, width=50, textvariable=self.item_str_set)
+        self.item_str_set_entry = ttk.Entry(self.mainframe, width=30, textvariable=self.item_str_set)
 
-        #root.after(1,self.get_left_time)
         self.check_actives()
         self.display()
 
@@ -76,7 +74,7 @@ class Main():
         ttk.Label(self.mainframe, text="格式: 名字 小时;").grid(column=1, row=2, sticky=(W))
         ttk.Label(self.mainframe, textvariable=self.left_time_str).grid(column=2, row=1, sticky=(W))
 
-        ttk.Button(self.mainframe, text="提交", command=self.get_item).grid(column=3, row=3, sticky=W)
+        ttk.Button(self.mainframe, text="提交", command=self.get_item).grid(column=3, row=2, sticky=W)
         self.display_item_button()
 
     def display_item_button(self):
@@ -88,8 +86,15 @@ class Main():
         actives_list = []
         root.after(1000, self.check_actives)
 
-        for item_ in self.items:
-            actives_list.append(item_.actives)
+        del_flag = False
+        for i in range(len(self.items)):
+            actives_list.append(self.items[i].actives)
+            if self.items[i].delete_flag:
+                del_flag = True
+                del_num = i
+
+        if del_flag:
+            del self.items[del_num]
 
         if True in actives_list:
             if not self.actives :
@@ -99,9 +104,6 @@ class Main():
             if self.actives:
                 self.actives = False
                 self.display_item_button()
-
-        #self.ref:
-        #self.ref = True
 
 root = Tk()
 tha=Main(root)
