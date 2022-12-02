@@ -50,6 +50,7 @@ class Item():
             self.button_del_str.set("你确定么？")
             self.cancel_button.grid(column=4, row=self.row, sticky=W)
             self.yes_flag = True
+            self.actives=False
         else:
             self.text.destroy()
             self.delete_button.destroy()
@@ -73,15 +74,26 @@ class Item():
     def get_left_need_time(self):
         """得到剩余时间"""
         now_time = datetime.datetime.now()
+        sleep_time = datetime.datetime(2022, 11, 30, hour=21)
 
         self.now_time_H = int(now_time.strftime("%H"))
         self.now_time_M = int(now_time.strftime("%M"))
         self.now_time_S = int(now_time.strftime("%S"))
-        self.need_time = self.end_time - \
-            datetime.timedelta(minutes=self.now_time_M,
+      
+        now_time =  datetime.timedelta(minutes=self.now_time_M,
                                hours=self.now_time_H, seconds=self.now_time_S)
 
-        self.needtimestr = self.name +" " +self.need_time.strftime("%H:%M:%S")
+        self.need_time = self.end_time - now_time
+        int_time = int(self.need_time.strftime("%H"))
+        int_time_M = int(self.need_time.strftime("%M"))
+        int_time_S = int(self.need_time.strftime("%S"))
+
+        now_need_time =  datetime.timedelta(minutes=self.now_time_M+int_time_M,
+                               hours=self.now_time_H+int_time, seconds=self.now_time_S+int_time_S)
+
+        left_time = sleep_time - now_need_time
+
+        self.needtimestr = self.name +" " +self.need_time.strftime("%H:%M:%S")+' 剩余'+left_time.strftime("%H:%M:%S")
         self.check_left_time()
         self.need_time_str.set(self.needtimestr)
 

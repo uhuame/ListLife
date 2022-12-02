@@ -33,7 +33,7 @@ def handle_items(value, items, items_added, root):
                 item.append(i)
             items.append(Item(item[0], item[1], False, root))
             #将添加过的项目储存在变量里
-            item.append(True)
+            item.append(False)
             items_added.append(item)
             item=[]
     save_file(items_added)
