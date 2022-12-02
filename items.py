@@ -12,10 +12,12 @@ class Item():
         self.actives = False
         self.delete_flag = False
         self.yes_flag = False
+        self.break_flag = False
         self.done_flag = done_flag
         self.need_time_H = need_time 
         self.need_time_str = StringVar()
         self.need_time = datetime.datetime(2022, 11, 30, hour=int(need_time))
+        self.break_time = datetime.datetime(2022, 11, 30, hour=int(need_time))
 
         self.need_time_str.set(self.name + " " +self.need_time.strftime("%H:%M:%S"))
 
@@ -27,11 +29,11 @@ class Item():
         self.delete_button = ttk.Button(frame, textvariable=self.button_del_str, command=self.delete)
         self.cancel_button = ttk.Button(frame, text="取消", command=self.cancel)
         self.text = ttk.Label(frame, textvariable=self.need_time_str)
+
     def displayme(self, frame, num_row, actives, now_time=""):
         """显示任务"""
         self.start_row=3
         self.row = self.start_row+num_row
-
 
         self.activess =actives
 
@@ -43,6 +45,7 @@ class Item():
             self.button_str.set("开始")
         else:
             self.button_str.set("已经有开始得了")
+
         self.check_left_time()
 
     def delete(self):
@@ -68,22 +71,26 @@ class Item():
         now_time = datetime.datetime.now()
         if not self.activess and not self.actives:
             self.end_time =  now_time + datetime.timedelta(hours=int(self.need_time_H))
+            self.breaktime =  now_time + datetime.timedelta(minutes=30)
             self.get_left_need_time()
             self.actives =True
 
     def get_left_need_time(self):
         """得到剩余时间"""
-        now_time = datetime.datetime.now()
+
+        self.now_time = datetime.datetime.now()
         sleep_time = datetime.datetime(2022, 11, 30, hour=21)
 
-        self.now_time_H = int(now_time.strftime("%H"))
-        self.now_time_M = int(now_time.strftime("%M"))
-        self.now_time_S = int(now_time.strftime("%S"))
+        self.now_time_H = int(self.now_time.strftime("%H"))
+        self.now_time_M = int(self.now_time.strftime("%M"))
+        self.now_time_S = int(self.now_time.strftime("%S"))
       
-        now_time =  datetime.timedelta(minutes=self.now_time_M,
+        self.now_time =  datetime.timedelta(minutes=self.now_time_M,
                                hours=self.now_time_H, seconds=self.now_time_S)
 
-        self.need_time = self.end_time - now_time
+        self.need_time = self.end_time - self.now_time
+        self.break_time = self.breaktime - self.now_time
+
         int_time = int(self.need_time.strftime("%H"))
         int_time_M = int(self.need_time.strftime("%M"))
         int_time_S = int(self.need_time.strftime("%S"))
@@ -93,7 +100,7 @@ class Item():
 
         left_time = sleep_time - now_need_time
 
-        self.needtimestr = self.name +" " +self.need_time.strftime("%H:%M:%S")+' 剩余'+left_time.strftime("%H:%M:%S")
+        self.needtimestr = self.name +" " +self.need_time.strftime("%H:%M:%S")+' 剩余'+left_time.strftime("%H:%M:%S")+"距离休息还有："+ self.break_time.strftime("%M:%S")
         self.check_left_time()
         self.need_time_str.set(self.needtimestr)
 
@@ -101,9 +108,22 @@ class Item():
     def check_left_time(self):
 
         if int(self.need_time.strftime("%H")) > 5 or self.done_flag:
+
             self.actives = False
             self.done_flag = True
             self.needtimestr=self.name +"完成 "
             self.need_time_str.set(self.needtimestr)
+
+        if int(self.break_time.strftime("%H")) > 5 or self.break_flag:
+            if int(self.break_time.strftime("%H")) > 5 and self.break_flag :
+                self.break_flag = False
+                self.breaktime =  self.breaktime + datetime.timedelta(minutes=30)
+            elif not self.break_flag :
+                self.break_flag = True
+                self.end_time =  self.end_time + datetime.timedelta(minutes=10)
+                self.breaktime =  self.breaktime + datetime.timedelta(minutes=10)
+            self.needtimestr=self.name +"休息了" + self.break_time.strftime("%M:%S")
+
         if self.actives:
+
             self.root.after(1000,self.get_left_need_time)
