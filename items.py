@@ -4,7 +4,7 @@ from tkinter import *
 from tkinter import ttk
 
 class Item():
-    def __init__(self, name, need_time, root):
+    def __init__(self, name, need_time, done_flag, root):
         """初始化要完成的任务"""
         self.name = name
 
@@ -12,6 +12,7 @@ class Item():
         self.actives = False
         self.delete_flag = False
         self.yes_flag = False
+        self.done_flag = done_flag
         self.need_time_H = need_time 
         self.need_time_str = StringVar()
         self.need_time = datetime.datetime(2022, 11, 30, hour=int(need_time))
@@ -78,16 +79,17 @@ class Item():
         self.now_time_S = int(now_time.strftime("%S"))
         self.need_time = self.end_time - \
             datetime.timedelta(minutes=self.now_time_M,
-                               hours=self.now_time_H, seconds=self.now_time_S)
+                               hours=3, seconds=self.now_time_S)
 
         self.needtimestr = self.name +" " +self.need_time.strftime("%H:%M:%S")
         self.check_left_time()
 
-        self.need_time_str.set(self.needtimestr)
 
     def check_left_time(self):
-        if int(self.need_time.strftime("%H")) > 5:
+        if int(self.need_time.strftime("%H")) > 5 or self.done_flag:
             self.actives = False
+            self.done_flag = True
             self.needtimestr=self.name +"时间结束 "
+            self.need_time_str.set(self.needtimestr)
         if self.actives:
             self.root.after(1000,self.get_left_need_time)

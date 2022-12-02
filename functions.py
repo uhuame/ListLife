@@ -14,8 +14,8 @@ def load_file(items, items_added, root):
     with open(filename) as f_obj:
         value = json.load(f_obj)
         for i in value:
-            items.append(Item(i[0], i[1], root))
-        items_added = value
+            items.append(Item(i[0], i[1], i[2], root))
+        items_added = value[:]
 
     return items, items_added
 
@@ -31,8 +31,9 @@ def handle_items(value, items, items_added, root):
                 if i[-1] == ";":
                     i = i[:-1]
                 item.append(i)
-            items.append(Item(item[0], item[1], root))
+            items.append(Item(item[0], item[1], False, root))
             #将添加过的项目储存在变量里
+            item.append(True)
             items_added.append(item)
             item=[]
     save_file(items_added)

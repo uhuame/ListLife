@@ -24,7 +24,6 @@ class Main():
 
         self.mainframe = ttk.Frame(root, padding="5 5 12 3")
         self.mainframe.grid(column=0,row=0,sticky=(N,W,E,S))
-        root.columnconfigure(0,weight=1)
         root.rowconfigure(0,weight=1)
 
         self.item_str_set = StringVar()
@@ -67,6 +66,7 @@ class Main():
         self.left_time_str.set(left_time.strftime("%H:%M:%S"))
         
         self.root.after(1000, self.get_left_time)
+
     def display(self):
         self.item_str_set_entry.grid(column=2, row=2, sticky=(W, E))
 
@@ -89,6 +89,10 @@ class Main():
         del_flag = False
         for i in range(len(self.items)):
             actives_list.append(self.items[i].actives)
+            if self.items[i].done_flag:
+                if self.items_added[i][2] != True :
+                    self.items_added[i][2] = True
+
             if self.items[i].delete_flag:
                 del_flag = True
                 del_num = i
