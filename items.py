@@ -32,7 +32,7 @@ class Item():
         self.activess =actives
         self.button = ttk.Button(frame, textvariable=self.button_str, command=self.start)
         self.delete_button = ttk.Button(frame, textvariable=self.button_del_str, command=self.delete)
-        self.cancel = ttk.Button(frame, text="取消", command=self.cancel)
+        self.cancel_button = ttk.Button(frame, text="取消", command=self.cancel)
 
         self.delete_button.grid(column=3, row=self.row, sticky=W)
         self.button.grid(column=2, row=self.row, sticky=W)
@@ -47,18 +47,19 @@ class Item():
     def delete(self):
         if not self.yes_flag:
             self.button_del_str.set("你确定么？")
-            self.cancel.grid(column=4, row=self.row, sticky=W)
+            self.cancel_button.grid(column=4, row=self.row, sticky=W)
             self.yes_flag = True
         else:
             self.text.destroy()
             self.delete_button.destroy()
+            self.cancel_button.destroy()
             self.button.destroy()
             self.delete_flag = True
 
     def cancel(self):
             self.yes_flag = False
             self.button_del_str.set("删除")
-            self.cancel.grid_remove()
+            self.cancel_button.grid_remove()
 
     def start(self):
         """开始任务"""

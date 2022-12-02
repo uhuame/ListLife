@@ -22,7 +22,7 @@ class Main():
 
         root.title("排课软件")
 
-        self.mainframe = ttk.Frame(root,padding="3 3 12 12")
+        self.mainframe = ttk.Frame(root, padding="5 5 12 3")
         self.mainframe.grid(column=0,row=0,sticky=(N,W,E,S))
         root.columnconfigure(0,weight=1)
         root.rowconfigure(0,weight=1)
