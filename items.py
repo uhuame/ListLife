@@ -79,13 +79,15 @@ class Item():
         self.now_time_S = int(now_time.strftime("%S"))
         self.need_time = self.end_time - \
             datetime.timedelta(minutes=self.now_time_M,
-                               hours=3, seconds=self.now_time_S)
+                               hours=self.now_time_H, seconds=self.now_time_S)
 
         self.needtimestr = self.name +" " +self.need_time.strftime("%H:%M:%S")
         self.check_left_time()
+        self.need_time_str.set(self.needtimestr)
 
 
     def check_left_time(self):
+
         if int(self.need_time.strftime("%H")) > 5 or self.done_flag:
             self.actives = False
             self.done_flag = True

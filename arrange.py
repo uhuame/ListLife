@@ -84,7 +84,7 @@ class Main():
     def check_actives(self): 
 
         actives_list = []
-        root.after(1000, self.check_actives)
+        root.after(500, self.check_actives)
 
         del_flag = False
         for i in range(len(self.items)):
@@ -92,16 +92,16 @@ class Main():
             if self.items[i].done_flag:
                 if self.items_added[i][2] != True :
                     self.items_added[i][2] = True
-
             if self.items[i].delete_flag:
                 del_flag = True
                 del_num = i
 
         if del_flag:
             self.items_added.remove([self.items[del_num].name,\
-                    self.items[del_num].need_time_H])
+                    self.items[del_num].need_time_H, self.items[del_num].done_flag])
             f.save_file(self.items_added)
             del self.items[del_num]
+            del_flag = False
 
         if True in actives_list:
             if not self.actives :
@@ -115,4 +115,3 @@ class Main():
 root = Tk()
 tha=Main(root)
 root.mainloop()
-                
