@@ -35,14 +35,13 @@ def handle_items(value, items, items_added, root):
     """处理项目"""
     item = []
     #能run就行讲究那么多干啥😅
+    if value[-1] != ';':
+        value +=';'
     for bi in value.split(";"):
-        print(bi)
         if bi:
             for i in bi.split():
                 if i[-1] == ";":
                     i = i[:-1]
-                else:
-                    bi += ";"
                 item.append(i)
             items.append(Item(item[0], item[1], root))
             item=[]

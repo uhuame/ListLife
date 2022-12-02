@@ -92,12 +92,15 @@ class Main():
             actives_list.append(item_.actives)
 
         if True in actives_list:
-            self.actives = True
+            if not self.actives :
+                self.actives = True
+                self.display_item_button()
         else:
-            self.actives = False
+            if self.actives:
+                self.actives = False
+                self.display_item_button()
 
         #self.ref:
-        self.display_item_button()
         #self.ref = True
 
 root = Tk()
