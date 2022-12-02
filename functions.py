@@ -13,8 +13,11 @@ def load_file(items, items_added, root):
     filename = "data.json"
     with open(filename) as f_obj:
         value = json.load(f_obj)
-    tmp = handle_items(value, items, items_added, root)
-    return tmp
+        for i in value:
+            items.append(Item(i[0], i[1], root))
+        items_added = value
+
+    return items, items_added
 
 def handle_items(value, items, items_added, root):
     """处理项目"""
@@ -29,9 +32,9 @@ def handle_items(value, items, items_added, root):
                     i = i[:-1]
                 item.append(i)
             items.append(Item(item[0], item[1], root))
+            #将添加过的项目储存在变量里
+            items_added.append(item)
             item=[]
-    #将添加过的项目储存在变量里
-    items_added += value
     save_file(items_added)
     return items, items_added
 

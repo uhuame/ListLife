@@ -12,7 +12,7 @@ class Main():
         self.sleep_time = datetime.datetime(2022, 11, 30, hour=21)
         self.root =root
         self.items = []
-        self.items_added = ""
+        self.items_added = []
         self.actives = False
         
         self.item_str = StringVar()
@@ -94,6 +94,9 @@ class Main():
                 del_num = i
 
         if del_flag:
+            self.items_added.remove([self.items[del_num].name,\
+                    self.items[del_num].need_time_H])
+            f.save_file(self.items_added)
             del self.items[del_num]
 
         if True in actives_list:
