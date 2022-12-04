@@ -28,6 +28,7 @@ class Item():
         self.button = ttk.Button(frame, textvariable=self.button_str, command=self.start)
         self.delete_button = ttk.Button(frame, textvariable=self.button_del_str, command=self.delete)
         self.cancel_button = ttk.Button(frame, text="取消", command=self.cancel)
+        self.delay_button = ttk.Button(frame, text="贪睡时间", command=self.delay)
         self.text = ttk.Label(frame, textvariable=self.need_time_str)
 
     def displayme(self, frame, num_row, actives, now_time=""):
@@ -37,7 +38,7 @@ class Item():
 
         self.activess =actives
 
-        self.delete_button.grid(column=3, row=self.row, sticky=W)
+        self.delete_button.grid(column=5, row=self.row, sticky=W)
         self.button.grid(column=2, row=self.row, sticky=W)
         self.text.grid(column=1, row=self.row, sticky=W)
 
@@ -51,7 +52,7 @@ class Item():
     def delete(self):
         if not self.yes_flag:
             self.button_del_str.set("你确定么？")
-            self.cancel_button.grid(column=4, row=self.row, sticky=W)
+            self.cancel_button.grid(column=5, row=self.row, sticky=W)
             self.yes_flag = True
             self.actives=False
         else:
@@ -60,6 +61,10 @@ class Item():
             self.cancel_button.destroy()
             self.button.destroy()
             self.delete_flag = True
+
+    def delay(self):
+            self.done_flag = False
+            self.need_time_str.set(self.name + " " +self.need_time.strftime("%H:%M:%S"))
 
     def cancel(self):
             self.yes_flag = False
@@ -74,6 +79,28 @@ class Item():
             self.breaktime =  now_time + datetime.timedelta(minutes=30)
             self.get_left_need_time()
             self.actives =True
+
+    def check_left_time(self):
+
+        if int(self.need_time.strftime("%H")) > 5 or self.done_flag:
+            self.delay_button.grid(column=4, row=self.row, sticky=W)
+            self.actives = False
+            self.done_flag = True
+            self.needtimestr=self.name +"完成 "
+            self.need_time_str.set(self.needtimestr)
+
+        if int(self.break_time.strftime("%H")) > 5 or self.break_flag:
+            if int(self.break_time.strftime("%H")) > 5 and self.break_flag :
+                self.break_flag = False
+                self.breaktime =  self.breaktime + datetime.timedelta(minutes=30)
+            elif not self.break_flag :
+                self.break_flag = True
+                self.end_time =  self.end_time + datetime.timedelta(minutes=10)
+                self.breaktime =  self.breaktime + datetime.timedelta(minutes=10)
+            self.needtimestr=self.name +"休息了" + self.break_time.strftime("%M:%S")
+
+        if self.actives:
+            self.root.after(1000,self.get_left_need_time)
 
     def get_left_need_time(self):
         """得到剩余时间"""
@@ -103,27 +130,3 @@ class Item():
         self.needtimestr = self.name +" " +self.need_time.strftime("%H:%M:%S")+' 剩余'+left_time.strftime("%H:%M:%S")+"距离休息还有："+ self.break_time.strftime("%M:%S")
         self.check_left_time()
         self.need_time_str.set(self.needtimestr)
-
-
-    def check_left_time(self):
-
-        if int(self.need_time.strftime("%H")) > 5 or self.done_flag:
-
-            self.actives = False
-            self.done_flag = True
-            self.needtimestr=self.name +"完成 "
-            self.need_time_str.set(self.needtimestr)
-
-        if int(self.break_time.strftime("%H")) > 5 or self.break_flag:
-            if int(self.break_time.strftime("%H")) > 5 and self.break_flag :
-                self.break_flag = False
-                self.breaktime =  self.breaktime + datetime.timedelta(minutes=30)
-            elif not self.break_flag :
-                self.break_flag = True
-                self.end_time =  self.end_time + datetime.timedelta(minutes=10)
-                self.breaktime =  self.breaktime + datetime.timedelta(minutes=10)
-            self.needtimestr=self.name +"休息了" + self.break_time.strftime("%M:%S")
-
-        if self.actives:
-
-            self.root.after(1000,self.get_left_need_time)
