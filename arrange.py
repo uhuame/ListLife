@@ -9,7 +9,7 @@ import functions as f
 class Main():
     
     def __init__(self, root):
-        self.sleep_time = datetime.datetime(2022, 11, 30, hour=21)
+        self.sleep_time = datetime.datetime(2022, 11, 30, hour=20)
         self.root =root
         self.items = []
         self.items_added = []
@@ -98,7 +98,7 @@ class Main():
 
         if del_flag:
             self.items_added.remove([self.items[del_num].name,\
-                    self.items[del_num].need_time_H, self.items[del_num].done_flag])
+                    self.items[del_num].ticks, self.items[del_num].done_flag])
             f.save_file(self.items_added)
             del self.items[del_num]
             del_flag = False

@@ -14,10 +14,19 @@ class Item():
         self.yes_flag = False
         self.break_flag = False
         self.done_flag = done_flag
-        self.need_time_H = need_time 
+        
+        # 记录单位时间的次数 方便删除时使用
+        self.ticks = need_time
+
+        need_time = int(need_time) * 30 / 60
+
+        self.need_time_minute = int( (need_time - int(need_time)) * 60 )
+
+        self.need_time_H = int(need_time)
         self.need_time_str = StringVar()
-        self.need_time = datetime.datetime(2022, 11, 30, hour=int(need_time))
-        self.break_time = datetime.datetime(2022, 11, 30, hour=int(need_time))
+
+        self.need_time = datetime.datetime(2022, 11, 30, hour=self.need_time_H,minute=self.need_time_minute)
+        self.break_time = datetime.datetime(2022, 11, 30, hour=self.need_time_H,minute=self.need_time_minute)
 
         self.need_time_str.set(self.name + " " +self.need_time.strftime("%H:%M:%S"))
 
@@ -52,13 +61,14 @@ class Item():
     def delete(self):
         if not self.yes_flag:
             self.button_del_str.set("你确定么？")
-            self.cancel_button.grid(column=5, row=self.row, sticky=W)
+            self.cancel_button.grid(column=6, row=self.row, sticky=W)
             self.yes_flag = True
             self.actives=False
         else:
             self.text.destroy()
             self.delete_button.destroy()
             self.cancel_button.destroy()
+            self.delay_button.destroy()
             self.button.destroy()
             self.delete_flag = True
 
@@ -75,7 +85,7 @@ class Item():
         """开始任务"""
         now_time = datetime.datetime.now()
         if not self.activess and not self.actives:
-            self.end_time =  now_time + datetime.timedelta(hours=int(self.need_time_H))
+            self.end_time =  now_time + datetime.timedelta(hours=self.need_time_H,minutes=self.need_time_minute)
             self.breaktime =  now_time + datetime.timedelta(minutes=30)
             self.get_left_need_time()
             self.actives =True
