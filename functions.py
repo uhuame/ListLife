@@ -14,9 +14,8 @@ def load_file(items, items_added, frame, root):
     with open(filename) as f_obj:
         value = json.load(f_obj)
         for i in value:
-            items.append(Item(i[0], i[1], i[2], frame, root))
+            items.append(Item(i,"asd", frame, root))
         items_added = value[:]
-
     return items, items_added
 
 def handle_items(value, items, items_added, frame, root):

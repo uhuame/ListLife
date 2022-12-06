@@ -52,7 +52,8 @@ class Main():
     def get_left_time(self):
         """计算剩余时间"""
     
-        self.end_time =self.sleep_time
+        self.end_time = self.sleep_time
+
         #设置初始时间
         now_time = datetime.datetime.now()
         now_time_H = int(now_time.strftime("%H"))
@@ -61,20 +62,22 @@ class Main():
     
         #计算剩余时间
         left_time = self.end_time - \
-            datetime.timedelta(minutes=now_time_M,
-                               hours=now_time_H, seconds=now_time_S)
+            datetime.timedelta(minutes=now_time_M, hours=now_time_H, seconds=now_time_S) 
+
         self.left_time_str.set(left_time.strftime("%H:%M:%S"))
-        
-        self.root.after(1000, self.get_left_time)
+        #循环 
+        self.root.after(1050, self.get_left_time)
+
+
 
     def display(self):
-        self.item_str_set_entry.grid(column=2, row=2, sticky=(W, E))
+        self.item_str_set_entry.grid(column=2, row=2, columnspan=3,sticky=(W, E))
 
         ttk.Label(self.mainframe, text="剩余时间").grid(column=1, row=1, sticky=W)
         ttk.Label(self.mainframe, text="格式: 名字 小时;").grid(column=1, row=2, sticky=(W))
         ttk.Label(self.mainframe, textvariable=self.left_time_str).grid(column=2, row=1, sticky=(W))
 
-        ttk.Button(self.mainframe, text="提交", command=self.get_item).grid(column=3, row=2, sticky=W)
+        ttk.Button(self.mainframe, text="提交", command=self.get_item).grid(column=5, row=2, sticky=W)
         self.display_item_button()
 
     def display_item_button(self):
@@ -111,6 +114,17 @@ class Main():
             if self.actives:
                 self.actives = False
                 self.display_item_button()
+
+        for i in range(len(self.items)):
+            #弹出第0向当弹出的为True时i即为在self.items里的对应actives为true的
+            if actives_list.pop(0):
+                a = self.items[i].actclass
+                for item in self.items:
+                    if a == item.actclass:
+                        item.actclass = 0
+                    else:
+                        item.notstart_count +=1
+
 
 root = Tk()
 tha=Main(root)

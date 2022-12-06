@@ -3,22 +3,27 @@ import datetime,time
 from tkinter import *
 from tkinter import ttk
 
+from playsound import playsound
+
 class Item():
-    def __init__(self, name, need_time, done_flag, frame,root):
+    def __init__(self, itemattr , actclass, frame,root):
         """初始化要完成的任务"""
-        self.name = name
+        self.name = itemattr[0]
+
+        self.actclass = actclass
+        self.notstart_count = 0
 
         self.root = root
         self.actives = False
         self.delete_flag = False
         self.yes_flag = False
         self.break_flag = False
-        self.done_flag = done_flag
-        
-        # 记录单位时间的次数 方便删除时使用
-        self.ticks = need_time
+        self.done_flag = itemattr[2]        
 
-        need_time = int(need_time) * 30 / 60
+        # 记录单位时间的次数 方便删除时使用
+        self.ticks = itemattr[1]
+
+        need_time = int(itemattr[1]) * 30 / 60
 
         self.need_time_minute = int( (need_time - int(need_time)) * 60 )
 
@@ -85,7 +90,8 @@ class Item():
         """开始任务"""
         now_time = datetime.datetime.now()
         if not self.activess and not self.actives:
-            self.end_time =  now_time + datetime.timedelta(hours=self.need_time_H,minutes=self.need_time_minute)
+            playsound("Sounds/31b3533e-179ccf9d194.mp3", False)
+            self.end_time =  now_time + datetime.timedelta(hours=self.need_time_H,minutes=self.need_time_minute) # type datetime
             self.breaktime =  now_time + datetime.timedelta(minutes=30)
             self.get_left_need_time()
             self.actives =True
@@ -103,7 +109,9 @@ class Item():
             if int(self.break_time.strftime("%H")) > 5 and self.break_flag :
                 self.break_flag = False
                 self.breaktime =  self.breaktime + datetime.timedelta(minutes=30)
+                playsound("Sounds/31b3533e-179ccf9d194.mp3", False)
             elif not self.break_flag :
+                playsound("Sounds/restsound.wav", False)
                 self.break_flag = True
                 self.end_time =  self.end_time + datetime.timedelta(minutes=10)
                 self.breaktime =  self.breaktime + datetime.timedelta(minutes=10)
@@ -116,7 +124,7 @@ class Item():
         """得到剩余时间"""
 
         self.now_time = datetime.datetime.now()
-        sleep_time = datetime.datetime(2022, 11, 30, hour=21)
+        sleep_time = datetime.datetime(2022, 11, 30, hour=20)
 
         self.now_time_H = int(self.now_time.strftime("%H"))
         self.now_time_M = int(self.now_time.strftime("%M"))
@@ -124,7 +132,7 @@ class Item():
       
         self.now_time =  datetime.timedelta(minutes=self.now_time_M,
                                hours=self.now_time_H, seconds=self.now_time_S)
-
+        #end_time datetime-timedelta
         self.need_time = self.end_time - self.now_time
         self.break_time = self.breaktime - self.now_time
 
@@ -134,7 +142,8 @@ class Item():
 
         now_need_time =  datetime.timedelta(minutes=self.now_time_M+int_time_M,
                                hours=self.now_time_H+int_time, seconds=self.now_time_S+int_time_S)
-
+        #now_need_time = end_time
+        #datetime-timedelta
         left_time = sleep_time - now_need_time
 
         self.needtimestr = self.name +" " +self.need_time.strftime("%H:%M:%S")+' 剩余'+left_time.strftime("%H:%M:%S")+"距离休息还有："+ self.break_time.strftime("%M:%S")
