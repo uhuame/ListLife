@@ -6,11 +6,11 @@ from tkinter import ttk
 from playsound import playsound
 
 class Item():
-    def __init__(self, itemattr , actclass, frame,root):
+    def __init__(self, itemattr, frame,root):
         """初始化要完成的任务"""
         self.name = itemattr[0]
 
-        self.actclass = actclass
+        self.actclass = itemattr[3]
         self.notstart_count = 0
 
         self.root = root
@@ -55,7 +55,7 @@ class Item():
         self.delete_button.grid(column=5, row=self.row, sticky=W)
         self.button.grid(column=2, row=self.row, sticky=W)
         self.text.grid(column=1, row=self.row, sticky=W)
-
+        print(self.notstart_count)
         if not actives:
             self.button_str.set("开始")
         else:

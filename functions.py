@@ -14,25 +14,28 @@ def load_file(items, items_added, frame, root):
     with open(filename) as f_obj:
         value = json.load(f_obj)
         for i in value:
-            items.append(Item(i,"asd", frame, root))
+            items.append(Item(i, frame, root))
         items_added = value[:]
     return items, items_added
 
 def handle_items(value, items, items_added, frame, root):
     """处理项目"""
     item = []
+    value_str = value[0]
+    actives = value[1]
     #能run就行讲究那么多干啥😅
-    if value[-1] != ';':
-        value +=';'
-    for bi in value.split(";"):
+    if value_str[-1] != ';':
+        value_str +=';'
+    for bi in value_str.split(";"):
         if bi:
             for i in bi.split():
                 if i[-1] == ";":
                     i = i[:-1]
                 item.append(i)
-            items.append(Item(item[0], item[1], False, frame, root))
-            #将添加过的项目储存在变量里
             item.append(False)
+            item.append(actives)
+            items.append(Item(item, frame, root))
+            #将添加过的项目储存在变量里
             items_added.append(item)
             item=[]
     save_file(items_added)
