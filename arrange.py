@@ -3,6 +3,7 @@ import threading
 
 from tkinter import *
 from tkinter import ttk
+import tkinter.messagebox
 
 import functions as f
 
@@ -10,7 +11,7 @@ class Main():
     
     def __init__(self, root):
         self.sleep_time = datetime.datetime(2022, 11, 30, hour=20)
-        self.actives_list = ["数学","物理","历史","语文","英语","生物"]
+        self.actives_list = ["数学","物理","历史","语文","英语","生物","其他"]
         self.root =root
         self.items = []
         self.items_added = []
@@ -98,7 +99,7 @@ class Main():
     def check_actives(self): 
 
         actives_flag_list = []
-        root.after(500, self.check_actives)
+        root.after(50, self.check_actives)
 
         del_flag = False
         for i in range(len(self.items)):
@@ -112,31 +113,40 @@ class Main():
 
         if del_flag:
             self.items_added.remove([self.items[del_num].name,\
-                    self.items[del_num].ticks, self.items[del_num].done_flag])
+                    self.items[del_num].ticks, self.items[del_num].done_flag,\
+                    self.items[del_num].actclass])
             f.save_file(self.items_added)
             del self.items[del_num]
             del_flag = False
 
         if True in actives_flag_list:
+            actives_flag_index = actives_flag_list.index(True)
             if not self.actives :
                 self.actives = True
+                self.notstart_count(actives_flag_index)
                 self.display_item_button()
-        else:
-            if self.actives:
-                self.actives = False
-                self.display_item_button()
-
-        for i in range(len(self.items)):
-            #弹出第0向当弹出的为True时i即为在self.items里的对应actives为true的
-            if actives_flag_list.pop(0):
-                a = self.items[i].actclass
-                for item in self.items:
-                    if a == item.actclass:
-                        item.actclass = 0
-                    else:
-                        item.notstart_count +=1
+        elif self.actives:
+            self.actives = False
+            self.display_item_button()
+            notstartclass =""
+            for item in self.items:
+                if item.notstart_count > 3:
+                    notstartclass += item.name+" "
+            if notstartclass:
+                tkinter.messagebox.showinfo(title='display_messagebox',\
+                    message="太久没完成" + a)
 
 
+
+#[true,flase]
+
+    def notstart_count(self, actives_flag_index):
+        startclass = self.items[actives_flag_index].actclass
+        for item in self.items:
+            if startclass == item.actclass:
+                item.notstart_count = 0
+            elif not item.done_flag:
+                item.notstart_count +=1
 root = Tk()
 tha=Main(root)
 root.mainloop()

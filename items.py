@@ -55,7 +55,7 @@ class Item():
         self.delete_button.grid(column=5, row=self.row, sticky=W)
         self.button.grid(column=2, row=self.row, sticky=W)
         self.text.grid(column=1, row=self.row, sticky=W)
-        print(self.notstart_count)
+        #print(self.notstart_count)
         if not actives:
             self.button_str.set("开始")
         else:
@@ -90,7 +90,7 @@ class Item():
         """开始任务"""
         now_time = datetime.datetime.now()
         if not self.activess and not self.actives:
-            playsound("Sounds/31b3533e-179ccf9d194.mp3", False)
+            playsound("Sounds/startsound.mp3", False)
             self.end_time =  now_time + datetime.timedelta(hours=self.need_time_H,minutes=self.need_time_minute) # type datetime
             self.breaktime =  now_time + datetime.timedelta(minutes=30)
             self.get_left_need_time()
@@ -107,9 +107,10 @@ class Item():
 
         if int(self.break_time.strftime("%H")) > 5 or self.break_flag:
             if int(self.break_time.strftime("%H")) > 5 and self.break_flag :
+                print("bug检测")
                 self.break_flag = False
                 self.breaktime =  self.breaktime + datetime.timedelta(minutes=30)
-                playsound("Sounds/31b3533e-179ccf9d194.mp3", False)
+                playsound("Sounds/startsound.mp3", False)
             elif not self.break_flag :
                 playsound("Sounds/restsound.wav", False)
                 self.break_flag = True
