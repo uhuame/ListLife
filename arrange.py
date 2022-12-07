@@ -19,6 +19,7 @@ class Main():
         
         self.item_str = StringVar()
         self.left_time_str = StringVar()
+        self.hide_str = StringVar(value="隐藏")
         self.choicesvar = StringVar(value=self.actives_list)
 
         self.get_left_time()
@@ -86,11 +87,23 @@ class Main():
         .grid(column=2, row=1, sticky=(W))
         ttk.Button(self.mainframe, text="提交", command=self.get_item)\
         .grid(column=5, row=2, sticky=W)
+        ttk.Button(self.mainframe, textvariable=self.hide_str, command=self.hide_done)\
+        .grid(column=5, row=1, sticky=W)
         
         self.activeslist = Listbox(self.mainframe, listvariable=self.choicesvar, height = 1)
         self.activeslist.grid(column=3, row=1, sticky=W)
 #        ttk.Scrollbar(self.mainframe, orient=VERTICAL, command=self.activeslist.yview)rowspan=20
         self.display_item_button()
+
+    def hide_done(self):
+        """隐藏已经完成的项目"""
+        for item in self.items:
+            if item.hide_flag:
+                item.display()
+                self.hide_str.set("隐藏")
+            elif item.done_flag :
+                item.hide()
+                self.hide_str.set("显示")
 
     def display_item_button(self):
         for i in range(len(self.items)):
@@ -99,7 +112,7 @@ class Main():
     def check_actives(self): 
 
         actives_flag_list = []
-        root.after(50, self.check_actives)
+        root.after(500, self.check_actives)
 
         del_flag = False
         for i in range(len(self.items)):
@@ -134,7 +147,7 @@ class Main():
                     notstartclass += item.name+" "
             if notstartclass:
                 tkinter.messagebox.showinfo(title='display_messagebox',\
-                    message="太久没完成" + a)
+                    message="太久没完成" + notstartclass)
 
 
 

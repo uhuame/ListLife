@@ -19,6 +19,7 @@ class Item():
         self.yes_flag = False
         self.break_flag = False
         self.done_flag = itemattr[2]        
+        self.hide_flag = False
 
         # 记录单位时间的次数 方便删除时使用
         self.ticks = itemattr[1]
@@ -55,6 +56,7 @@ class Item():
         self.delete_button.grid(column=5, row=self.row, sticky=W)
         self.button.grid(column=2, row=self.row, sticky=W)
         self.text.grid(column=1, row=self.row, sticky=W)
+        
         #print(self.notstart_count)
         if not actives:
             self.button_str.set("开始")
@@ -76,6 +78,22 @@ class Item():
             self.delay_button.destroy()
             self.button.destroy()
             self.delete_flag = True
+
+    def display(self):
+        self.text.grid()
+        self.delete_button.grid()
+        self.delay_button.grid()
+        self.button.grid()
+        self.hide_flag = False
+        
+    def hide(self):
+        self.text.grid_remove()
+        self.text.grid_remove()
+        self.delete_button.grid_remove()
+        self.cancel_button.grid_remove()
+        self.delay_button.grid_remove()
+        self.button.grid_remove()
+        self.hide_flag = True
 
     def delay(self):
             self.done_flag = False
