@@ -11,7 +11,7 @@ class Item():
         self.name = itemattr[0]
 
         self.actclass = itemattr[3]
-        self.notstart_count = 0
+        self.notstart_count = itemattr[4]
 
         self.root = root
         self.actives = False

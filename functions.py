@@ -23,6 +23,7 @@ def handle_items(value, items, items_added, frame, root):
     item = []
     value_str = value[0]
     actives = value[1]
+    notstart_count = value[2]
     #能run就行讲究那么多干啥😅
     if value_str[-1] != ';':
         value_str +=';'
@@ -34,10 +35,10 @@ def handle_items(value, items, items_added, frame, root):
                 item.append(i)
             item.append(False)
             item.append(actives)
+            item.append(notstart_count)
             items.append(Item(item, frame, root))
             #将添加过的项目储存在变量里
             items_added.append(item)
             item=[]
     save_file(items_added)
     return items, items_added
-

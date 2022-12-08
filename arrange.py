@@ -43,10 +43,14 @@ class Main():
 
     def get_item(self):
         #得到要完成的任务并绘制
-
-        actives_index =self.activeslist.curselection()[0]
+        notstart_count = 0
+        actives_index = self.activeslist.curselection()[0]
+        itemactclass = self.actives_list[actives_index]
+        for item in self.items:
+            if item.actclass == itemactclass :
+                notstart_count = item.notstart_count
         value = [self.item_str_set.get(),\
-                self.actives_list[actives_index]]
+                itemactclass, notstart_count]
         item= f.handle_items(value, self.items, self.items_added, self.mainframe, root)
         self.items = item[0]
         self.items_added = item[1]
@@ -120,6 +124,7 @@ class Main():
             if self.items[i].done_flag:
                 if self.items_added[i][2] != True :
                     self.items_added[i][2] = True
+                    f.save_file(self.items_added)
             if self.items[i].delete_flag:
                 del_flag = True
                 del_num = i
@@ -127,7 +132,7 @@ class Main():
         if del_flag:
             self.items_added.remove([self.items[del_num].name,\
                     self.items[del_num].ticks, self.items[del_num].done_flag,\
-                    self.items[del_num].actclass])
+                    self.items[del_num].actclass,self.items[del_num].notstart_count])
             f.save_file(self.items_added)
             del self.items[del_num]
             del_flag = False
@@ -149,10 +154,7 @@ class Main():
                 tkinter.messagebox.showinfo(title='display_messagebox',\
                     message="太久没完成" + notstartclass)
 
-
-
 #[true,flase]
-
     def notstart_count(self, actives_flag_index):
         startclass = self.items[actives_flag_index].actclass
         for item in self.items:
@@ -160,6 +162,9 @@ class Main():
                 item.notstart_count = 0
             elif not item.done_flag:
                 item.notstart_count +=1
+            self.items_added[self.items.index(item)][4] = item.notstart_count
+        f.save_file(self.items_added)
+
 root = Tk()
 tha=Main(root)
 root.mainloop()
