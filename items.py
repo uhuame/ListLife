@@ -46,24 +46,16 @@ class Item():
         self.delay_button = ttk.Button(frame, text="贪睡时间", command=self.delay)
         self.text = ttk.Label(frame, textvariable=self.need_time_str)
 
-    def displayme(self, frame, num_row, actives, now_time=""):
-        """显示任务"""
+    def displayme(self, num_row, actives, now_time=""):
+        """配置显示任务"""
         self.start_row=3
         self.row = self.start_row+num_row
-
         self.activess =actives
-
-        self.delete_button.grid(column=5, row=self.row, sticky=W)
-        self.button.grid(column=2, row=self.row, sticky=W)
-        self.text.grid(column=1, row=self.row, sticky=W)
-        
-        #print(self.notstart_count)
         if not actives:
             self.button_str.set("开始")
         else:
             self.button_str.set("已经有开始得了")
-
-        self.check_left_time()
+#        self.check_left_time()
 
     def delete(self):
         if not self.yes_flag:
@@ -80,10 +72,11 @@ class Item():
             self.delete_flag = True
 
     def display(self):
-        self.text.grid()
-        self.delete_button.grid()
-        self.delay_button.grid()
-        self.button.grid()
+        self.text.grid_configure(column=1, row=self.row, sticky=W)
+        self.delete_button.grid(column=5, row=self.row, sticky=W)
+        self.button.grid(column=2, row=self.row, sticky=W)
+        if self.done_flag:
+            self.delay_button.grid_configure(column=4, row=self.row, sticky=W)
         self.hide_flag = False
         
     def hide(self):
@@ -111,13 +104,13 @@ class Item():
             playsound("Sounds/startsound.mp3", False)
             self.end_time =  now_time + datetime.timedelta(hours=self.need_time_H,minutes=self.need_time_minute) # type datetime
             self.breaktime =  now_time + datetime.timedelta(minutes=30)
-            self.get_left_need_time()
-            self.actives =True
+            self.actives =True #必须在下面那个之前
+            self.check_left_time()
 
     def check_left_time(self):
 
         if int(self.need_time.strftime("%H")) > 5 or self.done_flag:
-            self.delay_button.grid(column=4, row=self.row, sticky=W)
+            self.delay_button.grid()
             self.actives = False
             self.done_flag = True
             self.needtimestr=self.name +"完成 "
@@ -129,6 +122,7 @@ class Item():
                 self.break_flag = False
                 self.breaktime =  self.breaktime + datetime.timedelta(minutes=30)
                 playsound("Sounds/startsound.mp3", False)
+
             elif not self.break_flag :
                 playsound("Sounds/restsound.wav", False)
                 self.break_flag = True
@@ -141,7 +135,6 @@ class Item():
 
     def get_left_need_time(self):
         """得到剩余时间"""
-
         self.now_time = datetime.datetime.now()
         sleep_time = datetime.datetime(2022, 11, 30, hour=20)
 

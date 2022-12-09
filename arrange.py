@@ -54,8 +54,10 @@ class Main():
         item= f.handle_items(value, self.items, self.items_added, self.mainframe, root)
         self.items = item[0]
         self.items_added = item[1]
+
         #刷新按钮
         self.display_item_button()
+        self.items[-1].display()
 
 
     def get_left_time(self):
@@ -78,7 +80,6 @@ class Main():
         self.root.after(1050, self.get_left_time)
 
 
-
     def display(self):
         self.item_str_set_entry\
         .grid(column=2, row=2, columnspan=3,sticky=(W, E))
@@ -98,6 +99,8 @@ class Main():
         self.activeslist.grid(column=3, row=1, sticky=W)
 #        ttk.Scrollbar(self.mainframe, orient=VERTICAL, command=self.activeslist.yview)rowspan=20
         self.display_item_button()
+        for item in self.items:
+            item.display()
 
     def hide_done(self):
         """隐藏已经完成的项目"""
@@ -111,7 +114,7 @@ class Main():
 
     def display_item_button(self):
         for i in range(len(self.items)):
-            self.items[i].displayme(self.mainframe, i, self.actives)
+            self.items[i].displayme(i, self.actives)
 
     def check_actives(self): 
 
