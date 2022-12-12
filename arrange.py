@@ -11,12 +11,24 @@ class Main():
     
     def __init__(self, root):
         self.sleep_time = datetime.datetime(2022, 11, 30, hour=20)
-        self.actives_list = ["数学","物理","历史","语文","英语","生物","其他"]
+        #self.actives_dict = {"数学": 0, "物理": 0,"政治": 0,"语文": 0,"英语": 0,"生物": 0,"其他": 0}
         self.root =root
         self.items = []
         self.items_added = []
         self.actives = False
-        
+
+        self.mainframe = ttk.Frame(root, padding="5 5 12 3")
+        self.mainframe.grid(column=0,row=0,sticky=(N,W,E,S))
+
+        item = f.load_file(self.items, self.items_added, self.mainframe, root)
+        self.items = item[0]
+        self.items_added = item[1]
+        self.actives_dict = item[2]
+
+        self.actives_list = []
+        for i in self.actives_dict.keys():
+            self.actives_list.append(i)
+
         self.item_str = StringVar()
         self.left_time_str = StringVar()
         self.hide_str = StringVar(value="隐藏")
@@ -26,16 +38,11 @@ class Main():
 
         root.title("排课软件")
 
-        self.mainframe = ttk.Frame(root, padding="5 5 12 3")
-        self.mainframe.grid(column=0,row=0,sticky=(N,W,E,S))
         #root.rowconfigure(0,weight=1)
 
         self.item_str_set = StringVar()
         self.item_str_set_entry = ttk.Entry(self.mainframe, width=30, textvariable=self.item_str_set)
 
-        item = f.load_file(self.items, self.items_added, self.mainframe, root)
-        self.items = item[0]
-        self.items_added = item[1]
         self.display()
         self.check_actives()
         #root.bind("<Return>", calculate)
@@ -43,15 +50,11 @@ class Main():
 
     def get_item(self):
         #得到要完成的任务并绘制
-        notstart_count = 0
         actives_index = self.activeslist.curselection()[0]
         itemactclass = self.actives_list[actives_index]
-        for item in self.items:
-            if item.actclass == itemactclass :
-                notstart_count = item.notstart_count
         value = [self.item_str_set.get(),\
-                itemactclass, notstart_count]
-        item= f.handle_items(value, self.items, self.items_added, self.mainframe, root)
+                itemactclass]
+        item= f.handle_items(value, self.items, self.items_added, self.actives_dict, self.mainframe, root)
         self.items = item[0]
         self.items_added = item[1]
 
@@ -127,7 +130,7 @@ class Main():
             if self.items[i].done_flag:
                 if self.items_added[i][2] != True :
                     self.items_added[i][2] = True
-                    f.save_file(self.items_added)
+                    f.save_file(self.items_added, self.actives_dict)
             if self.items[i].delete_flag:
                 del_flag = True
                 del_num = i
@@ -135,8 +138,8 @@ class Main():
         if del_flag:
             self.items_added.remove([self.items[del_num].name,\
                     self.items[del_num].ticks, self.items[del_num].done_flag,\
-                    self.items[del_num].actclass,self.items[del_num].notstart_count])
-            f.save_file(self.items_added)
+                    self.items[del_num].actclass,])
+            f.save_file(self.items_added, self.actives_dict)
             del self.items[del_num]
             del_flag = False
 
@@ -150,23 +153,39 @@ class Main():
             self.actives = False
             self.display_item_button()
             notstartclass =""
-            for item in self.items:
-                if item.notstart_count > 3:
-                    notstartclass += item.name+" "
+            for key, value in self.actives_dict.items():
+                if value >= 3:
+                    notstartclass += key+" :"
+                    for item in self.items:
+                        if not item.done_flag:
+                            if item.actclass == key:
+                                notstartclass += item.name
             if notstartclass:
                 tkinter.messagebox.showinfo(title='display_messagebox',\
                     message="太久没完成" + notstartclass)
+            """
+            for item in self.items:
+                if item.notstart_count > 3:
+                    notstartclass += item.name+" "
+            """
 
 #[true,flase]
     def notstart_count(self, actives_flag_index):
         startclass = self.items[actives_flag_index].actclass
-        for item in self.items:
+        for i in self.actives_dict.keys():
+            self.actives_dict[i] += 1
+        #此行必在上下面 (将开始的类的计数归零)
+        self.actives_dict[startclass] = 0
+        print(self.actives_dict)
+        #for item in self.items:
+        """
             if startclass == item.actclass:
                 item.notstart_count = 0
             elif not item.done_flag:
                 item.notstart_count +=1
-            self.items_added[self.items.index(item)][4] = item.notstart_count
-        f.save_file(self.items_added)
+        """
+            #self.items_added[self.items.index(item)][4] = item.notstart_count
+        f.save_file(self.items_added, self.actives_dict)
 
 root = Tk()
 tha=Main(root)
