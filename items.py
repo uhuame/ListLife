@@ -8,10 +8,8 @@ from playsound import playsound
 class Item():
     def __init__(self, itemattr, frame,root):
         """初始化要完成的任务"""
-        self.name = itemattr[0]
-
         self.actclass = itemattr[3]
-
+        self.name = self.actclass + itemattr[0]
         self.root = root
         self.actives = False
         self.delete_flag = False
@@ -77,6 +75,7 @@ class Item():
         if self.done_flag:
             self.delay_button.grid_configure(column=4, row=self.row, sticky=W)
         self.hide_flag = False
+        self.check_left_time()
         
     def hide(self):
         self.text.grid_remove()
@@ -88,8 +87,17 @@ class Item():
         self.hide_flag = True
 
     def delay(self):
-            self.done_flag = False
-            self.need_time_str.set(self.name + " " +self.need_time.strftime("%H:%M:%S"))
+        self.need_time_H = 0
+        self.need_time_minute = 30
+        self.done_flag = False
+        self.need_time_str.set(self.name + " " +self.need_time.strftime("%H:%M:%S"))
+        self.check_left_time()
+
+    def fuc(self, need_time_H, need_time_minute):
+        self.now_time = datetime.datetime.now()
+        self.end_time =  self.now_time + datetime.timedelta(hours=need_time_H,minutes=need_time_minute) # type datetime
+        self.breaktime =  self.now_time + datetime.timedelta(minutes=30)
+
 
     def cancel(self):
             self.yes_flag = False
@@ -98,18 +106,16 @@ class Item():
 
     def start(self):
         """开始任务"""
-        now_time = datetime.datetime.now()
         if not self.activess and not self.actives:
+            self.fuc(self.need_time_H, self.need_time_minute)
             playsound("Sounds/startsound.mp3", False)
-            self.end_time =  now_time + datetime.timedelta(hours=self.need_time_H,minutes=self.need_time_minute) # type datetime
-            self.breaktime =  now_time + datetime.timedelta(minutes=30)
             self.actives =True #必须在下面那个之前
             self.check_left_time()
 
     def check_left_time(self):
 
         if int(self.need_time.strftime("%H")) > 5 or self.done_flag:
-            self.delay_button.grid()
+            self.delay_button.grid(column=4, row=self.row, sticky=W)
             self.actives = False
             self.done_flag = True
             self.needtimestr=self.name +"完成 "

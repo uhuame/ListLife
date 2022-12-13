@@ -5,14 +5,14 @@ import threading
 from items import *
 
 def save_file(items_added, actives):
-    filename = "data.json"
+    filename = "./data.json"
     content = items_added[:]
     content.insert(0,actives)
     with open(filename, "w") as f_obj:
         json.dump(content, f_obj, sort_keys=True, indent=4)
 
 def load_file(items, items_added, frame, root):
-    filename = "data.json"
+    filename = "./data.json"
     with open(filename) as f_obj:
         value = json.load(f_obj)
         actives_dict = value[0]

@@ -11,7 +11,6 @@ class Main():
     
     def __init__(self, root):
         self.sleep_time = datetime.datetime(2022, 11, 30, hour=20)
-        #self.actives_dict = {"数学": 0, "物理": 0,"政治": 0,"语文": 0,"英语": 0,"生物": 0,"其他": 0}
         self.root =root
         self.items = []
         self.items_added = []
@@ -32,7 +31,8 @@ class Main():
         self.item_str = StringVar()
         self.left_time_str = StringVar()
         self.hide_str = StringVar(value="隐藏")
-        self.choicesvar = StringVar(value=self.actives_list)
+        #self.choicesvar = StringVar(value=self.actives_list)
+        self.choicesvar = StringVar(value="请键入一个活动的名称")
 
         self.get_left_time()
 
@@ -47,11 +47,17 @@ class Main():
         self.check_actives()
         #root.bind("<Return>", calculate)
 
-
     def get_item(self):
         #得到要完成的任务并绘制
-        actives_index = self.activeslist.curselection()[0]
-        itemactclass = self.actives_list[actives_index]
+#        actives_index = self.activeslist.curselection()[0]
+        #itemactclass = self.actives_list[actives_index]
+        itemactclass = self.choicesvar.get()
+
+        if itemactclass not in self.actives_dict:
+            self.actives_dict[itemactclass] = 0
+            self.actives_list.append(itemactclass)
+            self.activeslist['values'] = self.actives_list
+
         value = [self.item_str_set.get(),\
                 itemactclass]
         item= f.handle_items(value, self.items, self.items_added, self.actives_dict, self.mainframe, root)
@@ -98,9 +104,11 @@ class Main():
         ttk.Button(self.mainframe, textvariable=self.hide_str, command=self.hide_done)\
         .grid(column=5, row=1, sticky=W)
         
-        self.activeslist = Listbox(self.mainframe, listvariable=self.choicesvar, height = 1)
+        #self.activeslist = Listbox(self.mainframe, listvariable=self.choicesvar, height = 1)
+        #self.activeslist.grid(column=3, row=1, sticky=W)
+        self.activeslist = ttk.Combobox(self.mainframe, text=self.choicesvar, height = 5)
         self.activeslist.grid(column=3, row=1, sticky=W)
-#        ttk.Scrollbar(self.mainframe, orient=VERTICAL, command=self.activeslist.yview)rowspan=20
+        self.activeslist['values'] = self.actives_list
         self.display_item_button()
         for item in self.items:
             item.display()
@@ -128,7 +136,7 @@ class Main():
         for i in range(len(self.items)):
             actives_flag_list.append(self.items[i].actives)
             if self.items[i].done_flag:
-                if self.items_added[i][2] != True :
+                if self.items_added[i][2] != True : #完成状态
                     self.items_added[i][2] = True
                     f.save_file(self.items_added, self.actives_dict)
             if self.items[i].delete_flag:
@@ -163,11 +171,6 @@ class Main():
             if notstartclass:
                 tkinter.messagebox.showinfo(title='display_messagebox',\
                     message="太久没完成" + notstartclass)
-            """
-            for item in self.items:
-                if item.notstart_count > 3:
-                    notstartclass += item.name+" "
-            """
 
 #[true,flase]
     def notstart_count(self, actives_flag_index):
@@ -177,14 +180,6 @@ class Main():
         #此行必在上下面 (将开始的类的计数归零)
         self.actives_dict[startclass] = 0
         print(self.actives_dict)
-        #for item in self.items:
-        """
-            if startclass == item.actclass:
-                item.notstart_count = 0
-            elif not item.done_flag:
-                item.notstart_count +=1
-        """
-            #self.items_added[self.items.index(item)][4] = item.notstart_count
         f.save_file(self.items_added, self.actives_dict)
 
 root = Tk()
