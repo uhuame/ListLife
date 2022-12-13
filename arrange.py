@@ -5,6 +5,8 @@ from tkinter import *
 from tkinter import ttk
 import tkinter.messagebox
 
+import items as ITTE
+
 import functions as f
 
 class Main():
@@ -40,11 +42,17 @@ class Main():
 
         #root.rowconfigure(0,weight=1)
 
+        self.reminditem = ITTE.Item(["提醒", 1, False, "debug"], self.mainframe, root)
+        self.reminditem.activess = False
+        self.reminditem.actives = False
+        self.reminditem.start()
+
         self.item_str_set = StringVar()
         self.item_str_set_entry = ttk.Entry(self.mainframe, width=30, textvariable=self.item_str_set)
 
         self.display()
         self.check_actives()
+
         #root.bind("<Return>", calculate)
 
     def get_item(self):
@@ -132,7 +140,9 @@ class Main():
         actives_flag_list = []
         root.after(500, self.check_actives)
 
+         
         del_flag = False
+        # 获得完成标志与删除标志
         for i in range(len(self.items)):
             actives_flag_list.append(self.items[i].actives)
             if self.items[i].done_flag:
@@ -143,10 +153,12 @@ class Main():
                 del_flag = True
                 del_num = i
 
+        #print(self.reminditem.needtimestr)
+
         if del_flag:
             self.items_added.remove([self.items[del_num].name,\
                     self.items[del_num].ticks, self.items[del_num].done_flag,\
-                    self.items[del_num].actclass,])
+                    self.items[del_num].actclass])
             f.save_file(self.items_added, self.actives_dict)
             del self.items[del_num]
             del_flag = False
@@ -156,11 +168,17 @@ class Main():
             if not self.actives :
                 self.actives = True
                 self.notstart_count(actives_flag_index)
+
                 self.display_item_button()
+                self.reminditem.actives=False
         elif self.actives:
             self.actives = False
             self.display_item_button()
             notstartclass =""
+            #提醒
+            self.reminditem.delay(15)
+            self.reminditem.start()
+
             for key, value in self.actives_dict.items():
                 if value >= 3:
                     notstartclass += key+" :"
@@ -171,6 +189,14 @@ class Main():
             if notstartclass:
                 tkinter.messagebox.showinfo(title='display_messagebox',\
                     message="太久没完成" + notstartclass)
+
+        if self.reminditem.done_flag:
+            self.reminditem.start()
+            #tkinter.messagebox.showwarning(title='display_messagebox',message="请指定下一个项目" )
+            test =tkinter.messagebox.askquestion(title='display_messagebox', message="请指定下一个项目")
+            if test == 'yes':
+                self.reminditem.delay(1)
+                self.reminditem.start()
 
 #[true,flase]
     def notstart_count(self, actives_flag_index):

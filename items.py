@@ -9,7 +9,8 @@ class Item():
     def __init__(self, itemattr, frame,root):
         """初始化要完成的任务"""
         self.actclass = itemattr[3]
-        self.name = self.actclass + itemattr[0]
+        self.name= itemattr[0]
+        self.name_str = self.actclass + self.name 
         self.root = root
         self.actives = False
         self.delete_flag = False
@@ -31,7 +32,7 @@ class Item():
         self.need_time = datetime.datetime(2022, 11, 30, hour=self.need_time_H,minute=self.need_time_minute)
         self.break_time = datetime.datetime(2022, 11, 30, hour=self.need_time_H,minute=self.need_time_minute)
 
-        self.need_time_str.set(self.name + " " +self.need_time.strftime("%H:%M:%S"))
+        self.need_time_str.set(self.name_str + " " +self.need_time.strftime("%H:%M:%S"))
 
         self.button_str = StringVar()
         self.button_del_str = StringVar()
@@ -86,18 +87,28 @@ class Item():
         self.button.grid_remove()
         self.hide_flag = True
 
-    def delay(self):
+    def delay(self, need_time_minute=30):
         self.need_time_H = 0
-        self.need_time_minute = 30
+        self.need_time_minute=need_time_minute
         self.done_flag = False
-        self.need_time_str.set(self.name + " " +self.need_time.strftime("%H:%M:%S"))
-        self.check_left_time()
+        self.need_time_str.set(self.name_str + " " +self.need_time.strftime("%H:%M:%S"))
+        #self.check_left_time() # 用于在延迟后刷新标签
 
     def fuc(self, need_time_H, need_time_minute):
         self.now_time = datetime.datetime.now()
         self.end_time =  self.now_time + datetime.timedelta(hours=need_time_H,minutes=need_time_minute) # type datetime
         self.breaktime =  self.now_time + datetime.timedelta(minutes=30)
 
+        self.now_time = datetime.datetime.now()
+
+        self.now_time_H = int(self.now_time.strftime("%H"))
+        self.now_time_M = int(self.now_time.strftime("%M"))
+        self.now_time_S = int(self.now_time.strftime("%S"))
+      
+        self.now_time =  datetime.timedelta(minutes=self.now_time_M,
+                               hours=self.now_time_H, seconds=self.now_time_S)
+        #end_time datetime-timedelta
+        self.need_time = self.end_time - self.now_time
 
     def cancel(self):
             self.yes_flag = False
@@ -108,22 +119,23 @@ class Item():
         """开始任务"""
         if not self.activess and not self.actives:
             self.fuc(self.need_time_H, self.need_time_minute)
+            self.needtimestr=self.name_str +"完成 "
             playsound("Sounds/startsound.mp3", False)
             self.actives =True #必须在下面那个之前
             self.check_left_time()
+        else:
+            playsound("Sounds/badsound.wav", False)
 
     def check_left_time(self):
 
         if int(self.need_time.strftime("%H")) > 5 or self.done_flag:
-            self.delay_button.grid(column=4, row=self.row, sticky=W)
             self.actives = False
             self.done_flag = True
-            self.needtimestr=self.name +"完成 "
+            self.needtimestr=self.name_str +"完成 "
             self.need_time_str.set(self.needtimestr)
 
         if int(self.break_time.strftime("%H")) > 5 or self.break_flag:
             if int(self.break_time.strftime("%H")) > 5 and self.break_flag :
-                print("bug检测")
                 self.break_flag = False
                 self.breaktime =  self.breaktime + datetime.timedelta(minutes=30)
                 playsound("Sounds/startsound.mp3", False)
@@ -133,7 +145,7 @@ class Item():
                 self.break_flag = True
                 self.end_time =  self.end_time + datetime.timedelta(minutes=10)
                 self.breaktime =  self.breaktime + datetime.timedelta(minutes=10)
-            self.needtimestr=self.name +"休息了" + self.break_time.strftime("%M:%S")
+            self.needtimestr=self.name_str +"休息了" + self.break_time.strftime("%M:%S")
 
         if self.actives:
             self.root.after(1000,self.get_left_need_time)
@@ -163,6 +175,6 @@ class Item():
         #datetime-timedelta
         left_time = sleep_time - now_need_time
 
-        self.needtimestr = self.name +" " +self.need_time.strftime("%H:%M:%S")+' 剩余'+left_time.strftime("%H:%M:%S")+"距离休息还有："+ self.break_time.strftime("%M:%S")
+        self.needtimestr = self.name_str +" " +self.need_time.strftime("%H:%M:%S")+' 剩余'+left_time.strftime("%H:%M:%S")+"距离休息还有："+ self.break_time.strftime("%M:%S")
         self.check_left_time()
         self.need_time_str.set(self.needtimestr)
