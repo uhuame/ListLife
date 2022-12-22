@@ -11,18 +11,18 @@ def save_file(items_added, actives):
     with open(filename, "w") as f_obj:
         json.dump(content, f_obj, sort_keys=True, indent=4)
 
-def load_file(items, items_added, frame, root):
+def load_file(items, items_added, settings, frame, root):
     filename = "./data.json"
     with open(filename) as f_obj:
         value = json.load(f_obj)
         actives_dict = value[0]
         value = value[1:]
         for i in value:
-            items.append(Item(i, frame, root))
+            items.append(Item(i, settings, frame, root))
         items_added = value[:]
     return items, items_added, actives_dict
 
-def handle_items(value, items, items_added, actives_dict, frame, root):
+def handle_items(value, items, items_added, settings, actives_dict, frame, root):
     """处理项目"""
     item = []
     value_str = value[0]
@@ -38,7 +38,7 @@ def handle_items(value, items, items_added, actives_dict, frame, root):
                 item.append(i)
             item.append(False)
             item.append(actives)
-            items.append(Item(item, frame, root))
+            items.append(Item(item, settings, frame, root))
             #将添加过的项目储存在变量里
             items_added.append(item)
             item=[]

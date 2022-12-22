@@ -6,7 +6,7 @@ from tkinter import ttk
 from playsound import playsound
 
 class Item():
-    def __init__(self, itemattr, frame,root):
+    def __init__(self, itemattr, settings, frame, root):
         """初始化要完成的任务"""
         self.actclass = itemattr[3]
         self.name= itemattr[0]
@@ -22,7 +22,7 @@ class Item():
         # 记录单位时间的次数 方便删除时使用
         self.ticks = itemattr[1]
 
-        need_time = int(itemattr[1]) * 30 / 60
+        need_time = int(itemattr[1]) * settings.time_track / 60
 
         self.need_time_minute = int( (need_time - int(need_time)) * 60 )
 

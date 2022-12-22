@@ -8,11 +8,13 @@ import tkinter.messagebox
 import items as ITTE
 
 import functions as f
+from settings import Settings
 
 class Main():
     
     def __init__(self, root):
-        self.sleep_time = datetime.datetime(2022, 11, 30, hour=20)
+        self.settings = Settings()
+        self.sleep_time = self.settings.sleep_time
         self.root =root
         self.items = []
         self.items_added = []
@@ -21,7 +23,7 @@ class Main():
         self.mainframe = ttk.Frame(root, padding="5 5 12 3")
         self.mainframe.grid(column=0,row=0,sticky=(N,W,E,S))
 
-        item = f.load_file(self.items, self.items_added, self.mainframe, root)
+        item = f.load_file(self.items, self.items_added, self.settings, self.mainframe, root)
         self.items = item[0]
         self.items_added = item[1]
         self.actives_dict = item[2]
@@ -42,7 +44,7 @@ class Main():
 
         #root.rowconfigure(0,weight=1)
 
-        self.reminditem = ITTE.Item(["提醒", 1, False, "debug"], self.mainframe, root)
+        self.reminditem = ITTE.Item(["提醒", 1, False, "debug"], self.settings, self.mainframe, root)
         self.reminditem.activess = False
         self.reminditem.actives = False
         self.reminditem.start()
@@ -68,7 +70,7 @@ class Main():
 
         value = [self.item_str_set.get(),\
                 itemactclass]
-        item= f.handle_items(value, self.items, self.items_added, self.actives_dict, self.mainframe, root)
+        item= f.handle_items(value, self.items, self.items_added, self.settings, self.actives_dict, self.mainframe, root)
         self.items = item[0]
         self.items_added = item[1]
 
@@ -164,14 +166,13 @@ class Main():
             del_flag = False
 
         if True in actives_flag_list:
-            actives_flag_index = actives_flag_list.index(True)
             if not self.actives :
+                self.actives_flag_index = actives_flag_list.index(True)
                 self.actives = True
-                self.notstart_count(actives_flag_index)
-
                 self.display_item_button()
                 self.reminditem.actives=False
         elif self.actives:
+            self.notstart_count(self.actives_flag_index)
             self.actives = False
             self.display_item_button()
             notstartclass =""
@@ -180,7 +181,7 @@ class Main():
             self.reminditem.start()
 
             for key, value in self.actives_dict.items():
-                if value >= 3:
+                if value >= self.settings.count:
                     notstartclass += key+" :"
                     for item in self.items:
                         if not item.done_flag:
