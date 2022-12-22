@@ -5,6 +5,7 @@ import threading
 from items import *
 
 def save_file(items_added, actives):
+    #当修改data.json储存的结构时不用管这里 去修改handle_items 
     filename = "./data.json"
     content = items_added[:]
     content.insert(0,actives)
@@ -34,10 +35,12 @@ def handle_items(value, items, items_added, settings, actives_dict, frame, root)
         if bi:
             for i in bi.split():
                 if i[-1] == ";":
-                    i = i[:-1]
+                    i = int(i[:-1])
                 item.append(i)
+            item[-1] = int(item[-1])#将项目次数变为整数
             item.append(False)
             item.append(actives)
+            item.append(0)#已经度过的单位时间
             items.append(Item(item, settings, frame, root))
             #将添加过的项目储存在变量里
             items_added.append(item)

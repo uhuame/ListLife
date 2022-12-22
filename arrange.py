@@ -44,7 +44,7 @@ class Main():
 
         #root.rowconfigure(0,weight=1)
 
-        self.reminditem = ITTE.Item(["提醒", 1, False, "debug"], self.settings, self.mainframe, root)
+        self.reminditem = ITTE.Item(["提醒", 1, False, "debug", 0], self.settings, self.mainframe, root)
         self.reminditem.activess = False
         self.reminditem.actives = False
         self.reminditem.start()
@@ -156,14 +156,11 @@ class Main():
                 del_num = i
 
         #print(self.reminditem.needtimestr)
-
         if del_flag:
-            self.items_added.remove([self.items[del_num].name,\
-                    self.items[del_num].ticks, self.items[del_num].done_flag,\
-                    self.items[del_num].actclass])
-            f.save_file(self.items_added, self.actives_dict)
+            self.items_added.remove(self.items[del_num].itemattr)
             del self.items[del_num]
             del_flag = False
+            f.save_file(self.items_added, self.actives_dict)
 
         if True in actives_flag_list:
             if not self.actives :

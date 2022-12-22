@@ -8,41 +8,53 @@ from playsound import playsound
 class Item():
     def __init__(self, itemattr, settings, frame, root):
         """初始化要完成的任务"""
-        self.actclass = itemattr[3]
-        self.name= itemattr[0]
-        self.name_str = self.actclass + self.name 
-        self.root = root
-        self.actives = False
+        self.settings    = settings
+        self.itemattr    = itemattr#方便删除
+        self.name        = itemattr[0]
+        self.ticks       = itemattr[1]
+        self.done_flag   = itemattr[2]
+        self.actclass    = itemattr[3]
+        self.ticks_past  = itemattr[4] #已经度过的单位时
+        self.name_str    = self.actclass + self.name 
+        self.root        = root
+        self.actives     = False
         self.delete_flag = False
-        self.yes_flag = False
-        self.break_flag = False
-        self.done_flag = itemattr[2]        
-        self.hide_flag = False
+        self.yes_flag    = False
+        self.break_flag  = False
+        self.hide_flag   = False
 
-        # 记录单位时间的次数 方便删除时使用
-        self.ticks = itemattr[1]
-
-        need_time = int(itemattr[1]) * settings.time_track / 60
-
-        self.need_time_minute = int( (need_time - int(need_time)) * 60 )
-
-        self.need_time_H = int(need_time)
-        self.need_time_str = StringVar()
-
-        self.need_time = datetime.datetime(2022, 11, 30, hour=self.need_time_H,minute=self.need_time_minute)
-        self.break_time = datetime.datetime(2022, 11, 30, hour=self.need_time_H,minute=self.need_time_minute)
-
-        self.need_time_str.set(self.name_str + " " +self.need_time.strftime("%H:%M:%S"))
 
         self.button_str = StringVar()
         self.button_del_str = StringVar()
         self.button_del_str.set("删除")
+        self.need_time_str = StringVar()
 
+        self.init_needtime()
         self.button = ttk.Button(frame, textvariable=self.button_str, command=self.start)
         self.delete_button = ttk.Button(frame, textvariable=self.button_del_str, command=self.delete)
         self.cancel_button = ttk.Button(frame, text="取消", command=self.cancel)
         self.delay_button = ttk.Button(frame, text="贪睡时间", command=self.delay)
         self.text = ttk.Label(frame, textvariable=self.need_time_str)
+
+    def init_needtime(self,need_time_minute=''):
+        ''' 初始化needtime以及一系列东西'''
+        ticks = int(self.ticks) - self.ticks_past
+
+        need_time = int(ticks) * self.settings.time_track / 60
+
+        if not need_time_minute:
+            self.need_time_minute = int( (need_time - int(need_time)) * 60 )
+            print(1)
+        else:
+            self.need_time_minute = int( need_time_minute )
+
+
+        self.need_time_H = int(need_time)
+
+        self.need_time = datetime.datetime(2022, 11, 30, hour=self.need_time_H,minute=self.need_time_minute)
+        self.break_time = datetime.datetime(2022, 11, 30, hour=self.need_time_H,minute=self.need_time_minute)
+
+        self.need_time_str.set(self.name_str + " " + str(ticks) )
 
     def displayme(self, num_row, actives, now_time=""):
         """配置显示任务"""
@@ -64,9 +76,16 @@ class Item():
         else:
             self.text.destroy()
             self.delete_button.destroy()
-            self.cancel_button.destroy()
             self.delay_button.destroy()
+            self.cancel_button.destroy()
             self.button.destroy()
+            self.itemattr = [
+                    self.name,
+                    self.ticks,
+                    self.done_flag,
+                    self.actclass,
+                    self.ticks_past
+                    ]
             self.delete_flag = True
 
     def display(self):
@@ -87,17 +106,22 @@ class Item():
         self.button.grid_remove()
         self.hide_flag = True
 
-    def delay(self, need_time_minute=30):
+    def delay(self, need_time_minute=""):
+        self.ticks+=1
+        self.init_needtime(need_time_minute)
+        """
         self.need_time_H = 0
         self.need_time_minute=need_time_minute
-        self.done_flag = False
         self.need_time_str.set(self.name_str + " " +self.need_time.strftime("%H:%M:%S"))
+        """
+        self.done_flag = False
         #self.check_left_time() # 用于在延迟后刷新标签
 
     def fuc(self, need_time_H, need_time_minute):
+        "得到需要的时间"
         self.now_time = datetime.datetime.now()
         self.end_time =  self.now_time + datetime.timedelta(hours=need_time_H,minutes=need_time_minute) # type datetime
-        self.breaktime =  self.now_time + datetime.timedelta(minutes=30)
+        self.breaktime =  self.now_time + datetime.timedelta(minutes=self.settings.time_track)
 
         self.now_time = datetime.datetime.now()
 
@@ -128,7 +152,7 @@ class Item():
 
     def check_left_time(self):
 
-        if int(self.need_time.strftime("%H")) > 5 or self.done_flag:
+        if int(self.ticks) <= self.ticks_past or self.done_flag:
             self.actives = False
             self.done_flag = True
             self.needtimestr=self.name_str +"完成 "
@@ -136,15 +160,19 @@ class Item():
 
         if int(self.break_time.strftime("%H")) > 5 or self.break_flag:
             if int(self.break_time.strftime("%H")) > 5 and self.break_flag :
+                #如果正要开始项目执行下列
                 self.break_flag = False
                 self.breaktime =  self.breaktime + datetime.timedelta(minutes=30)
                 playsound("Sounds/startsound.mp3", False)
 
             elif not self.break_flag :
+                #如果正要开始休息执行下列
                 playsound("Sounds/restsound.wav", False)
                 self.break_flag = True
-                self.end_time =  self.end_time + datetime.timedelta(minutes=10)
-                self.breaktime =  self.breaktime + datetime.timedelta(minutes=10)
+                #self.end_time =  self.end_time + datetime.timedelta(minutes=10)
+                #self.breaktime =  self.breaktime + datetime.timedelta(minutes=10)
+                self.ticks_past += 1 #添加过去的时间
+                print(213)
             self.needtimestr=self.name_str +"休息了" + self.break_time.strftime("%M:%S")
 
         if self.actives:
