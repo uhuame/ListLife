@@ -44,7 +44,7 @@ class Main():
 
         #root.rowconfigure(0,weight=1)
 
-        self.reminditem = ITTE.Item(["提醒", 1, False, "debug", 0], self.settings, self.mainframe, root)
+        self.reminditem = ITTE.Item(["提醒", 0, False, "debug", 0], self.settings, self.mainframe, root)
         self.reminditem.activess = False
         self.reminditem.actives = False
         self.reminditem.start()
@@ -101,14 +101,14 @@ class Main():
 
     def display(self):
         self.item_str_set_entry\
-        .grid(column=2, row=2, columnspan=3,sticky=(W, E))
+        .grid(column=3, row=2, columnspan=3,sticky=(W, E))
 
         ttk.Label(self.mainframe, text="剩余时间")\
         .grid(column=1, row=1, sticky=W)
         ttk.Label(self.mainframe, text="格式: 名字 小时;")\
         .grid(column=1, row=2, sticky=(W))
         ttk.Label(self.mainframe, textvariable=self.left_time_str)\
-        .grid(column=2, row=1, sticky=(W))
+        .grid(column=3, row=1, sticky=(W))
         ttk.Button(self.mainframe, text="提交", command=self.get_item)\
         .grid(column=5, row=2, sticky=W)
         ttk.Button(self.mainframe, textvariable=self.hide_str, command=self.hide_done)\
@@ -117,8 +117,17 @@ class Main():
         #self.activeslist = Listbox(self.mainframe, listvariable=self.choicesvar, height = 1)
         #self.activeslist.grid(column=3, row=1, sticky=W)
         self.activeslist = ttk.Combobox(self.mainframe, text=self.choicesvar, height = 5)
-        self.activeslist.grid(column=3, row=1, sticky=W)
+        self.activeslist.grid(column=4, row=1, sticky=W)
         self.activeslist['values'] = self.actives_list
+
+        #self.daylist = ttk.Combobox(self.mainframe, text=self.choicesvar, height = 5)
+        #self.daylist.grid(column=2, row=2, sticky=W)
+        #self.daylist['values'] = self.day_list
+
+        #self.mouthlist = ttk.Combobox(self.mainframe, text=self.choicesvar, height = 5)
+        #self.mouthlist.grid(column=2, row=1, sticky=W)
+        #self.mouthlist['values'] = self.mouth_list
+
         self.display_item_button()
         for item in self.items:
             item.display()
@@ -188,12 +197,15 @@ class Main():
                 tkinter.messagebox.showinfo(title='display_messagebox',\
                     message="太久没完成" + notstartclass)
 
+        print("休息:"+self.reminditem.break_time.strftime("%M:%S"))
+        print("剩余:"+self.reminditem.need_time.strftime("%M:%S"))
+
         if self.reminditem.done_flag:
             self.reminditem.start()
-            #tkinter.messagebox.showwarning(title='display_messagebox',message="请指定下一个项目" )
             test =tkinter.messagebox.askquestion(title='display_messagebox', message="请指定下一个项目")
             if test == 'yes':
                 self.reminditem.delay(1)
+                self.reminditem.break_flag = False
                 self.reminditem.start()
 
 #[true,flase]

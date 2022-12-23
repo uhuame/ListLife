@@ -8,3 +8,5 @@ class Settings():
         self.time_track = 1
         #多少个事件未作时提醒
         self.count = 10
+        #休息时间
+        self.rest_time = 0
