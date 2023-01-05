@@ -35,6 +35,7 @@ class Main():
         self.item_str = StringVar()
         self.left_time_str = StringVar()
         self.hide_str = StringVar(value="隐藏")
+        self.notstartclass_str = StringVar()
         #self.choicesvar = StringVar(value=self.actives_list)
         self.choicesvar = StringVar(value="请键入一个活动的名称")
 
@@ -44,9 +45,10 @@ class Main():
 
         #root.rowconfigure(0,weight=1)
 
-        self.reminditem = ITTE.Item(["提醒", 0, False, "debug", 0], self.settings, self.mainframe, root)
+        self.reminditem = ITTE.Item(["提醒", 1, False, "debug", 0], self.settings, self.mainframe, root)
         self.reminditem.activess = False
         self.reminditem.actives = False
+        self.reminditem.delay(15)
         self.reminditem.start()
 
         self.item_str_set = StringVar()
@@ -113,6 +115,8 @@ class Main():
         .grid(column=5, row=2, sticky=W)
         ttk.Button(self.mainframe, textvariable=self.hide_str, command=self.hide_done)\
         .grid(column=5, row=1, sticky=W)
+        ttk.Label(self.mainframe, textvariable=self.notstartclass_str)\
+        .grid(column=2, row=2, sticky=W)
         
         #self.activeslist = Listbox(self.mainframe, listvariable=self.choicesvar, height = 1)
         #self.activeslist.grid(column=3, row=1, sticky=W)
@@ -151,20 +155,25 @@ class Main():
         actives_flag_list = []
         root.after(500, self.check_actives)
 
-         
         del_flag = False
-        # 获得完成标志与删除标志
+        # 获得完成标志与删除标志需要保存标志
         for i in range(len(self.items)):
             actives_flag_list.append(self.items[i].actives)
-            if self.items[i].done_flag:
-                if self.items_added[i][2] != True : #完成状态
-                    self.items_added[i][2] = True
-                    f.save_file(self.items_added, self.actives_dict)
+
+            #如果保存标志为真则保存
+            if self.items[i].save_flag:
+                self.items_added[i][0] = self.items[i].name        
+                self.items_added[i][1] = self.items[i].ticks       
+                self.items_added[i][2] = self.items[i].done_flag   
+                self.items_added[i][3] = self.items[i].actclass    
+                self.items_added[i][4] = self.items[i].ticks_past  
+                f.save_file(self.items_added, self.actives_dict)
+                self.items[i].save_flag = False
+
             if self.items[i].delete_flag:
                 del_flag = True
                 del_num = i
 
-        #print(self.reminditem.needtimestr)
         if del_flag:
             self.items_added.remove(self.items[del_num].itemattr)
             del self.items[del_num]
@@ -192,13 +201,14 @@ class Main():
                     for item in self.items:
                         if not item.done_flag:
                             if item.actclass == key:
-                                notstartclass += item.name
+                                notstartclass += item.name + "\n"
             if notstartclass:
                 tkinter.messagebox.showinfo(title='display_messagebox',\
                     message="太久没完成" + notstartclass)
+                self.notstartclass_str.set("太久没完成" + notstartclass)
 
-        print("休息:"+self.reminditem.break_time.strftime("%M:%S"))
-        print("剩余:"+self.reminditem.need_time.strftime("%M:%S"))
+        #print("休息:"+self.reminditem.break_time.strftime("%M:%S"))
+        #print("剩余:"+self.reminditem.need_time.strftime("%M:%S"))
 
         if self.reminditem.done_flag:
             self.reminditem.start()

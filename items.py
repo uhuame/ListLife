@@ -22,7 +22,9 @@ class Item():
         self.yes_flag    = False
         self.break_flag  = False
         self.hide_flag   = False
+        self.save_flag   = False
 
+        self.time_track = self.settings.time_track
 
         self.button_str = StringVar()
         self.button_del_str = StringVar(value="删除")
@@ -41,7 +43,7 @@ class Item():
         ''' 初始化needtime以及一系列东西'''
         ticks = int(self.ticks) - self.ticks_past
 
-        need_time = int(ticks) * self.settings.time_track / 60
+        need_time = int(ticks) * self.time_track / 60
 
         self.need_time_minute = int( (need_time - int(need_time)) * 60 )
         self.need_time_H = int(need_time)
@@ -82,6 +84,7 @@ class Item():
                     self.actclass,
                     self.ticks_past
                     ]
+            self.save_flag = True
             self.delete_flag = True
 
     def display(self):
@@ -105,8 +108,10 @@ class Item():
 
     def delay(self, need_time_minute=""):
         if need_time_minute:
-            self.settings.time_track = need_time_minute 
-        self.ticks+=1
+            self.time_track = need_time_minute 
+            self.ticks_past = 0
+        else:
+            self.ticks+=1
         self.init_needtime(need_time_minute)
         """
         self.need_time_H = 0
@@ -120,7 +125,8 @@ class Item():
         "得到需要的时间"
         self.now_time = datetime.datetime.now()
         self.end_time =  self.now_time + datetime.timedelta(hours=need_time_H,minutes=need_time_minute) # type datetime
-        self.breaktime =  self.now_time + datetime.timedelta(minutes=self.settings.time_track)
+        self.breaktime =  self.now_time + datetime.timedelta(minutes=self.time_track) 
+        #获得距离休息的时间 使用单独的变量是为了方便提醒项目改时间
 
         self.now_time = datetime.datetime.now()
 
@@ -157,12 +163,14 @@ class Item():
             self.needtimestr="完成"
             self.need_time_str.set(self.needtimestr)
 
+            self.save_flag = True#传递保存标志让arrange的函数保存
+
         if int(self.break_time.strftime("%H")) > 5 or self.break_flag:
             #当在休息(包括开始结束进行中时)执行下列
             if int(self.break_time.strftime("%H")) > 5 and self.break_flag :
                 #如果正要开始项目执行下列
                 self.break_flag = False
-                self.breaktime =  self.breaktime + datetime.timedelta(minutes=self.settings.time_track)
+                self.breaktime =  self.breaktime + datetime.timedelta(minutes=self.time_track)
                 playsound("Sounds/startsound.mp3", False)
 
             elif not self.break_flag :
@@ -172,6 +180,7 @@ class Item():
                 self.end_time =  self.end_time + datetime.timedelta(minutes=self.settings.rest_time)
                 self.breaktime =  self.breaktime + datetime.timedelta(minutes=self.settings.rest_time)
                 self.ticks_past += 1 #添加过去的时间
+                self.save_flag = True
             self.needtimestr="休息了" + self.break_time.strftime("%M:%S")
 
         if self.actives:
